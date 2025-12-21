@@ -42,22 +42,23 @@ public class DynamicPricingEngineServiceImpl implements DynamicPricingEngineServ
         EventRecord event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
 
-        if (!event.getActive()) {
+        if (!event.isActive()) {
             throw new RuntimeException("Event is not active");
         }
 
         SeatInventoryRecord inventory = inventoryRepository.findByEventId(eventId)
                 .orElseThrow(() -> new RuntimeException("Seat inventory not found"));
 
-        long daysToEvent = ChronoUnit.DAYS.between(LocalDate.now(), event.getEventDate());
+        long daysToEvent =
+                ChronoUnit.DAYS.between(LocalDate.now(), event.getEventDate());
 
         List<PricingRule> activeRules = ruleRepository.findByActiveTrue();
 
         List<PricingRule> matchedRules = activeRules.stream()
                 .filter(rule ->
-                        inventory.getRemainingSeats() >= rule.getMinRemainingSeats() &&
-                        inventory.getRemainingSeats() <= rule.getMaxRemainingSeats() &&
-                        daysToEvent <= rule.getDaysBeforeEvent()
+                        inventory.getRemainingSeats() >= rule.getMinRemainingSeats()
+                                && inventory.getRemainingSeats() <= rule.getMaxRemainingSeats()
+                                && daysToEvent <= rule.getDaysBeforeEvent()
                 )
                 .collect(Collectors.toList());
 
@@ -81,8 +82,8 @@ public class DynamicPricingEngineServiceImpl implements DynamicPricingEngineServ
         Optional<DynamicPriceRecord> lastRecord =
                 priceRepository.findFirstByEventIdOrderByComputedAtDesc(eventId);
 
-        if (lastRecord.isPresent() &&
-                Math.abs(lastRecord.get().getComputedPrice() - computedPrice) > 0.01) {
+        if (lastRecord.isPresent()
+                && Math.abs(lastRecord.get().getComputedPrice() - computedPrice) > 0.01) {
 
             PriceAdjustmentLog log = new PriceAdjustmentLog();
             log.setEvent(event);
