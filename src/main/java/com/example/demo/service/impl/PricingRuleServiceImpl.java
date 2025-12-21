@@ -19,28 +19,26 @@ public class PricingRuleServiceImpl implements PricingRuleService {
 
     @Override
     public PricingRule createRule(PricingRule rule) {
-
         if (pricingRuleRepository.existsByRuleCode(rule.getRuleCode())) {
             throw new RuntimeException("Pricing rule with code already exists");
         }
-
         return pricingRuleRepository.save(rule);
     }
 
     @Override
     public PricingRule updateRule(Long id, PricingRule updatedRule) {
 
-        PricingRule existingRule = pricingRuleRepository.findById(id)
+        PricingRule existing = pricingRuleRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Pricing rule not found"));
 
-        existingRule.setDescription(updatedRule.getDescription());
-        existingRule.setMinRemainingSeats(updatedRule.getMinRemainingSeats());
-        existingRule.setMaxRemainingSeats(updatedRule.getMaxRemainingSeats());
-        existingRule.setDaysBeforeEvent(updatedRule.getDaysBeforeEvent());
-        existingRule.setPriceMultiplier(updatedRule.getPriceMultiplier());
-        existingRule.setActive(updatedRule.getActive());
+        existing.setDescription(updatedRule.getDescription());
+        existing.setMinRemainingSeats(updatedRule.getMinRemainingSeats());
+        existing.setMaxRemainingSeats(updatedRule.getMaxRemainingSeats());
+        existing.setDaysBeforeEvent(updatedRule.getDaysBeforeEvent());
+        existing.setPriceMultiplier(updatedRule.getPriceMultiplier());
+        existing.setActive(updatedRule.getActive());
 
-        return pricingRuleRepository.save(existingRule);
+        return pricingRuleRepository.save(existing);
     }
 
     @Override
