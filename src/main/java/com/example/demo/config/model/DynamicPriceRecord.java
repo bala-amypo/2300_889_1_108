@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "dynamic_price_records")
 public class DynamicPriceRecord {
 
     @Id
@@ -13,30 +12,28 @@ public class DynamicPriceRecord {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "event_id", nullable = false)
     private EventRecord event;
 
-    @Column(nullable = false)
     private double computedPrice;
 
     @ElementCollection
-    @CollectionTable(name = "applied_pricing_rules", joinColumns = @JoinColumn(name = "price_record_id"))
-    @Column(name = "rule_code")
     private List<String> appliedRuleCodes;
 
-    @Column(nullable = false)
     private LocalDateTime computedAt;
 
-    // getters & setters
+    // Getters and Setters
     public Long getId() { return id; }
-    public EventRecord getEvent() { return event; }
-    public double getComputedPrice() { return computedPrice; }
-    public List<String> getAppliedRuleCodes() { return appliedRuleCodes; }
-    public LocalDateTime getComputedAt() { return computedAt; }
-
     public void setId(Long id) { this.id = id; }
+
+    public EventRecord getEvent() { return event; }
     public void setEvent(EventRecord event) { this.event = event; }
+
+    public double getComputedPrice() { return computedPrice; }
     public void setComputedPrice(double computedPrice) { this.computedPrice = computedPrice; }
+
+    public List<String> getAppliedRuleCodes() { return appliedRuleCodes; }
     public void setAppliedRuleCodes(List<String> appliedRuleCodes) { this.appliedRuleCodes = appliedRuleCodes; }
+
+    public LocalDateTime getComputedAt() { return computedAt; }
     public void setComputedAt(LocalDateTime computedAt) { this.computedAt = computedAt; }
 }
