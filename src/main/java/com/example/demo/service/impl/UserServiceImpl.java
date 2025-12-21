@@ -4,7 +4,6 @@ import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,12 +13,10 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.passwordEncoder = new BCryptPasswordEncoder();
     }
 
     @Override
@@ -42,25 +39,23 @@ public class UserServiceImpl implements UserService {
         return userRepository.findAll();
     }
 
-    // Register a new user
+    // Register user (plain password for now)
     @Override
     public boolean register(User user) {
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
             return false; // User already exists
         }
-        // Hash the password before saving
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        // Save password as is (not hashed)
         userRepository.save(user);
         return true;
     }
 
-    // Login user
+    // Login user (plain password check)
     @Override
-    public boolean login(String username, String password) {
-        Optional<User> userOptional = userRepository.findByEmail(username);
+    public boolean login(String email, String password) {
+        Optional<User> userOptional = userRepository.findByEmail(email);
         if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            return passwordEncoder.matches(password, user.getPassword());
+            return password.equals(userOptional.get().getPassword());
         }
         return false;
     }
