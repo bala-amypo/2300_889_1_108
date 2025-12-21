@@ -1,8 +1,6 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.model.EventRecord;
 import com.example.demo.model.SeatInventoryRecord;
-import com.example.demo.repository.EventRecordRepository;
 import com.example.demo.repository.SeatInventoryRecordRepository;
 import com.example.demo.service.SeatInventoryRecordService;
 import org.springframework.stereotype.Service;
@@ -14,13 +12,9 @@ import java.util.Optional;
 public class SeatInventoryRecordServiceImpl implements SeatInventoryRecordService {
 
     private final SeatInventoryRecordRepository inventoryRepository;
-    private final EventRecordRepository eventRepository;
 
-    public SeatInventoryRecordServiceImpl(
-            SeatInventoryRecordRepository inventoryRepository,
-            EventRecordRepository eventRepository) {
+    public SeatInventoryRecordServiceImpl(SeatInventoryRecordRepository inventoryRepository) {
         this.inventoryRepository = inventoryRepository;
-        this.eventRepository = eventRepository;
     }
 
     @Override
@@ -30,10 +24,9 @@ public class SeatInventoryRecordServiceImpl implements SeatInventoryRecordServic
 
     @Override
     public SeatInventoryRecord updateRemainingSeats(Long eventId, Integer remainingSeats) {
-
         SeatInventoryRecord inventory = inventoryRepository
                 .findByEventId(eventId)
-                .orElseThrow(() -> new RuntimeException("Inventory not found for event"));
+                .orElseThrow(() -> new RuntimeException("Inventory not found"));
 
         inventory.setRemainingSeats(remainingSeats);
         return inventoryRepository.save(inventory);
@@ -45,7 +38,7 @@ public class SeatInventoryRecordServiceImpl implements SeatInventoryRecordServic
     }
 
     @Override
-    public List<SeatInventoryRecord> getAll() {
+    public List<SeatInventoryRecord> getAllInventories() {
         return inventoryRepository.findAll();
     }
 }

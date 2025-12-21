@@ -9,7 +9,7 @@ public interface SeatInventoryRecordService {
 
     SeatInventoryRecord createInventory(SeatInventoryRecord inventory);
 
-    SeatInventoryRecord updateRemainingSeats(Long eventId, int seats);
+    SeatInventoryRecord updateRemainingSeats(Long eventId, Integer remainingSeats);
 
     Optional<SeatInventoryRecord> getByEventId(Long eventId);
 
