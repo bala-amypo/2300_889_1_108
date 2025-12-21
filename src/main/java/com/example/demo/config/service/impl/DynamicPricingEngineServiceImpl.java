@@ -1,16 +1,19 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.exception.BadRequestException;
 import com.example.demo.model.*;
 import com.example.demo.repository.*;
 import com.example.demo.service.DynamicPricingEngineService;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Service
 public class DynamicPricingEngineServiceImpl implements DynamicPricingEngineService {
 
     private final EventRecordRepository eventRepository;
@@ -37,48 +40,57 @@ public class DynamicPricingEngineServiceImpl implements DynamicPricingEngineServ
     public DynamicPriceRecord computeDynamicPrice(Long eventId) {
 
         EventRecord event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new BadRequestException("Event not found"));
+                .orElseThrow(() -> new RuntimeException("Event not found"));
 
         if (!event.getActive()) {
-            throw new BadRequestException("Event is not active");
+            throw new RuntimeException("Event is not active");
         }
 
         SeatInventoryRecord inventory = inventoryRepository.findByEventId(eventId)
-                .orElseThrow(() -> new BadRequestException("Seat inventory not found"));
+                .orElseThrow(() -> new RuntimeException("Seat inventory not found"));
 
-        long daysBeforeEvent = ChronoUnit.DAYS.between(LocalDate.now(), event.getEventDate());
+        long daysToEvent = ChronoUnit.DAYS.between(LocalDate.now(), event.getEventDate());
 
-        List<PricingRule> matchingRules = ruleRepository.findByActiveTrue()
-                .stream()
+        List<PricingRule> activeRules = ruleRepository.findByActiveTrue();
+
+        List<PricingRule> matchedRules = activeRules.stream()
                 .filter(rule ->
-                        (rule.getMinRemainingSeats() == null || inventory.getRemainingSeats() >= rule.getMinRemainingSeats()) &&
-                        (rule.getMaxRemainingSeats() == null || inventory.getRemainingSeats() <= rule.getMaxRemainingSeats()) &&
-                        (rule.getDaysBeforeEvent() == null || daysBeforeEvent <= rule.getDaysBeforeEvent())
+                        inventory.getRemainingSeats() >= rule.getMinRemainingSeats() &&
+                        inventory.getRemainingSeats() <= rule.getMaxRemainingSeats() &&
+                        daysToEvent <= rule.getDaysBeforeEvent()
                 )
                 .collect(Collectors.toList());
 
-        double multiplier = matchingRules.stream()
-                .mapToDouble(PricingRule::getPriceMultiplier)
-                .max()
+        double multiplier = matchedRules.stream()
+                .max(Comparator.comparing(PricingRule::getPriceMultiplier))
+                .map(PricingRule::getPriceMultiplier)
                 .orElse(1.0);
 
-        double newPrice = event.getBasePrice() * multiplier;
+        double computedPrice = event.getBasePrice() * multiplier;
 
         DynamicPriceRecord record = new DynamicPriceRecord();
         record.setEvent(event);
-        record.setComputedPrice(newPrice);
+        record.setComputedPrice(computedPrice);
         record.setAppliedRuleCodes(
-                matchingRules.stream().map(PricingRule::getRuleCode).collect(Collectors.joining(","))
+                matchedRules.stream()
+                        .map(PricingRule::getRuleCode)
+                        .collect(Collectors.toList())
         );
+        record.setComputedAt(LocalDateTime.now());
 
-        Optional<DynamicPriceRecord> previous = priceRepository.findFirstByEventIdOrderByComputedAtDesc(eventId);
+        Optional<DynamicPriceRecord> lastRecord =
+                priceRepository.findFirstByEventIdOrderByComputedAtDesc(eventId);
 
-        if (previous.isPresent() && Double.compare(previous.get().getComputedPrice(), newPrice) != 0) {
+        if (lastRecord.isPresent() &&
+                Math.abs(lastRecord.get().getComputedPrice() - computedPrice) > 0.01) {
+
             PriceAdjustmentLog log = new PriceAdjustmentLog();
             log.setEvent(event);
-            log.setOldPrice(previous.get().getComputedPrice());
-            log.setNewPrice(newPrice);
+            log.setOldPrice(lastRecord.get().getComputedPrice());
+            log.setNewPrice(computedPrice);
             log.setReason("Dynamic pricing adjustment");
+            log.setAdjustedAt(LocalDateTime.now());
+
             logRepository.save(log);
         }
 
