@@ -6,12 +6,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Entity
-@Table(name = "event_records")
-public class EventRecord {
-    // fields only
-}
-
 
 @Entity
 @Table(
