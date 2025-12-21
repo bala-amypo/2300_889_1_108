@@ -9,7 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/inventory")
-public class SeatInventoryRecordController {
+public class SeatInventoryController {
 
     private final SeatInventoryRecordService inventoryService;
 
