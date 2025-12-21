@@ -9,5 +9,8 @@ public interface PricingRuleRepository extends JpaRepository<PricingRule, Long> 
 
     boolean existsByRuleCode(String code);
 
+    Optional<PricingRule> findByRuleCode(String ruleCode);
+
+
     List<PricingRule> findByActiveTrue();
 }

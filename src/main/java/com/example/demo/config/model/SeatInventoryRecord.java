@@ -2,6 +2,17 @@ package com.example.demo.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+@Entity
+@Table(name = "event_records")
+public class EventRecord {
+    // fields only
+}
+
 
 @Entity
 @Table(name = "seat_inventory_records")
