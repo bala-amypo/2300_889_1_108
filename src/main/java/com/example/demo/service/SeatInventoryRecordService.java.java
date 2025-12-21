@@ -5,7 +5,7 @@ import com.example.demo.model.SeatInventoryRecord;
 import java.util.List;
 import java.util.Optional;
 
-public interface SeatInventoryService {
+public interface SeatInventoryRecordService {
 
     SeatInventoryRecord createInventory(SeatInventoryRecord inventory);
 
