@@ -13,4 +13,9 @@ public interface UserService {
     User getUserByEmail(String email);
 
     List<User> getAllUsers();
+
+    // Authentication methods
+    boolean register(User user);
+
+    boolean login(String username, String password);
 }
