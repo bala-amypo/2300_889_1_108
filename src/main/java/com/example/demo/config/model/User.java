@@ -21,10 +21,11 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    // ===== Constructors =====
     public User() {
     }
 
-    // getters
+    // ===== Getters =====
     public Long getId() {
         return id;
     }
@@ -37,10 +38,16 @@ public class User {
         return password;
     }
 
-    // setters
+    // ===== Setters =====
     public void setId(Long id) {
         this.id = id;
     }
 
     public void setEmail(String email) {
-        this.email = em
+        this.email = email;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+}
