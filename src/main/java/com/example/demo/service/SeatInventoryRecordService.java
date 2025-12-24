@@ -4,13 +4,13 @@ import com.example.demo.model.SeatInventoryRecord;
 import java.util.List;
 import java.util.Optional;
 
-public interface SeatInventoryService {
+public interface SeatInventoryRecordService {
 
- SeatInventoryRecord createInventory(SeatInventoryRecord inventory);
+    SeatInventoryRecord createInventory(SeatInventoryRecord inventory);
 
- SeatInventoryRecord updateRemainingSeats(Long eventId, Integer remainingSeats);
+    SeatInventoryRecord updateRemainingSeats(Long eventId, Integer remainingSeats);
 
- Optional<SeatInventoryRecord> getInventoryByEvent(Long eventId);
+    Optional<SeatInventoryRecord> getInventoryByEvent(Long eventId);
 
- List<SeatInventoryRecord> getAllInventories();
+    List<SeatInventoryRecord> getAllInventories();
 }
