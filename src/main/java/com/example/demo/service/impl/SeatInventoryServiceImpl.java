@@ -8,6 +8,9 @@ import com.example.demo.repository.SeatInventoryRecordRepository;
 import com.example.demo.service.SeatInventoryService;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+import java.util.List;
+
 @Service
 public class SeatInventoryServiceImpl implements SeatInventoryService {
 
@@ -36,8 +39,12 @@ public class SeatInventoryServiceImpl implements SeatInventoryService {
     }
 
     @Override
-    public SeatInventoryRecord getInventoryByEvent(long eventId) {
-        return repo.findByEventId(eventId)
+    public List<SeatInventoryRecord> getInventoryByEvent(long eventId) {
+
+        SeatInventoryRecord inv = repo.findByEventId(eventId)
                 .orElseThrow(() -> new BadRequestException("Seat inventory not found"));
+
+        // Convert Optional → List (because interface demands List)
+        return Collections.singletonList(inv);
     }
 }
