@@ -9,10 +9,8 @@ import java.io.IOException;
 public class HelloServlet extends HttpServlet {
 
     @Override
-    public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("text/plain");
-
-        // EXACT text evaluator expects
-        resp.getWriter().write("Hello Servlet Working");
+        resp.getWriter().write("Hello World");
     }
 }
