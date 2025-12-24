@@ -10,9 +10,9 @@ import java.util.List;
 @RequestMapping("/api/inventory")
 public class SeatInventoryRecordController {
 
-    private final SeatInventoryService service;
+    private final SeatInventoryRecordService service;
 
-    public SeatInventoryRecordController(SeatInventoryService service) {
+    public SeatInventoryRecordController(SeatInventoryRecordService service) {
         this.service = service;
     }
 

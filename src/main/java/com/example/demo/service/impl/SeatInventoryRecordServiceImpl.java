@@ -1,62 +1,57 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.exception.BadRequestException;
-import com.example.demo.model.EventRecord;
 import com.example.demo.model.SeatInventoryRecord;
-import com.example.demo.repository.EventRecordRepository;
 import com.example.demo.repository.SeatInventoryRecordRepository;
 import com.example.demo.service.SeatInventoryRecordService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class SeatInventoryRecordServiceImpl implements SeatInventoryRecordService {
 
-    private final SeatInventoryRecordRepository inventoryRepository;
-    private final EventRecordRepository eventRepository;
+    private final SeatInventoryRecordRepository repository;
 
-    public SeatInventoryRecordServiceImpl(SeatInventoryRecordRepository inventoryRepository,
-                                          EventRecordRepository eventRepository) {
-        this.inventoryRepository = inventoryRepository;
-        this.eventRepository = eventRepository;
+    public SeatInventoryRecordServiceImpl(SeatInventoryRecordRepository repository) {
+        this.repository = repository;
     }
 
     @Override
-    public SeatInventoryRecord createInventory(SeatInventoryRecord inventory) {
-
-        EventRecord event = eventRepository.findById(inventory.getEventId())
-                .orElseThrow();
-
-        if (inventory.getRemainingSeats() > inventory.getTotalSeats()) {
-            throw new BadRequestException("Remaining seats cannot exceed total seats");
-        }
-
-        return inventoryRepository.save(inventory);
+    public SeatInventoryRecord create(SeatInventoryRecord inventory) {
+        return repository.save(inventory);
     }
 
     @Override
-    public SeatInventoryRecord updateRemainingSeats(Long eventId, Integer remainingSeats) {
-
-        SeatInventoryRecord record = inventoryRepository.findByEventId(eventId)
-                .orElseThrow();
-
-        if (remainingSeats > record.getTotalSeats()) {
-            throw new BadRequestException("Remaining seats cannot exceed total seats");
-        }
-
-        record.setRemainingSeats(remainingSeats);
-        return inventoryRepository.save(record);
+    public SeatInventoryRecord getById(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Seat Inventory not found"));
     }
 
     @Override
-    public Optional<SeatInventoryRecord> getInventoryByEvent(Long eventId) {
-        return inventoryRepository.findByEventId(eventId);
+    public List<SeatInventoryRecord> getAll() {
+        return repository.findAll();
     }
 
     @Override
-    public List<SeatInventoryRecord> getAllInventories() {
-        return inventoryRepository.findAll();
+    public SeatInventoryRecord update(Long id, SeatInventoryRecord updated) {
+        SeatInventoryRecord record = getById(id);
+
+        record.setEventId(updated.getEventId());
+        record.setTotalSeats(updated.getTotalSeats());
+        record.setRemainingSeats(updated.getRemainingSeats());
+
+        return repository.save(record);
+    }
+
+    @Override
+    public void delete(Long id) {
+        repository.deleteById(id);
+    }
+
+    @Override
+    public SeatInventoryRecord updateRemainingSeats(Long id, Integer seats) {
+        SeatInventoryRecord record = getById(id);
+        record.setRemainingSeats(seats);
+        return repository.save(record);
     }
 }
