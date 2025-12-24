@@ -18,61 +18,87 @@ import java.util.List;
 @Service
 public class DynamicPricingEngineServiceImpl implements DynamicPricingEngineService {
 
-    private final EventRecordRepository eventRepo;
-    private final SeatInventoryRecordRepository inventoryRepo;
-    private final PricingRuleRepository ruleRepo;
-    private final DynamicPriceRecordRepository priceRepo;
+    private final EventRecordRepository eventRecordRepository;
+    private final SeatInventoryRecordRepository seatInventoryRecordRepository;
+    private final PricingRuleRepository pricingRuleRepository;
+    private final DynamicPriceRecordRepository dynamicPriceRecordRepository;
 
     public DynamicPricingEngineServiceImpl(
-            EventRecordRepository eventRepo,
-            SeatInventoryRecordRepository inventoryRepo,
-            PricingRuleRepository ruleRepo,
-            DynamicPriceRecordRepository priceRepo
+            EventRecordRepository eventRecordRepository,
+            SeatInventoryRecordRepository seatInventoryRecordRepository,
+            PricingRuleRepository pricingRuleRepository,
+            DynamicPriceRecordRepository dynamicPriceRecordRepository
     ) {
-        this.eventRepo = eventRepo;
-        this.inventoryRepo = inventoryRepo;
-        this.ruleRepo = ruleRepo;
-        this.priceRepo = priceRepo;
+        this.eventRecordRepository = eventRecordRepository;
+        this.seatInventoryRecordRepository = seatInventoryRecordRepository;
+        this.pricingRuleRepository = pricingRuleRepository;
+        this.dynamicPriceRecordRepository = dynamicPriceRecordRepository;
     }
 
     @Override
     public double calculateDynamicPrice(long eventId) {
 
-        EventRecord event = eventRepo.findById(eventId)
+        EventRecord event = eventRecordRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event Not Found"));
 
-        SeatInventoryRecord inventory = inventoryRepo.findByEventId(eventId)
-                .orElseThrow(() -> new RuntimeException("Inventory Not Found"));
+        List<SeatInventoryRecord> inventoryList =
+                seatInventoryRecordRepository.findByEventId(eventId);
 
-        List<PricingRule> rules = ruleRepo.findAll();
+        if (inventoryList.isEmpty()) {
+            throw new RuntimeException("No Seat Inventory Found");
+        }
 
-        double price = event.getBasePrice();
-        double remainingSeats = inventory.getRemainingSeats();
+        SeatInventoryRecord inventory = inventoryList.get(0);
 
-        long daysLeft = ChronoUnit.DAYS.between(LocalDate.now(), event.getEventDate());
+        double basePrice = event.getBasePrice();
+        int remainingSeats = inventory.getRemainingSeats();
+        LocalDate eventDate = event.getEventDate();
 
-        StringBuilder appliedRules = new StringBuilder();
+        long daysLeft = ChronoUnit.DAYS.between(LocalDate.now(), eventDate);
+
+        List<PricingRule> rules = pricingRuleRepository.findAll();
+        double finalPrice = basePrice;
+        String appliedRules = "";
 
         for (PricingRule r : rules) {
-            boolean seatsMatch =
+
+            boolean seatMatch =
                     remainingSeats >= r.getMinRemainingSeats()
                             && remainingSeats <= r.getMaxRemainingSeats();
 
-            boolean daysMatch = daysLeft <= r.getDaysBeforeEvent();
+            boolean dayMatch =
+                    daysLeft <= r.getDaysBeforeEvent();
 
-            if (seatsMatch && daysMatch && Boolean.TRUE.equals(r.getActive())) {
-                price = price * r.getPriceMultiplier();
-                appliedRules.append(r.getRuleCode()).append(",");
+            if (seatMatch && dayMatch && Boolean.TRUE.equals(r.getActive())) {
+                finalPrice = finalPrice * r.getPriceMultiplier();
+                appliedRules += r.getRuleCode() + ",";
             }
         }
 
         DynamicPriceRecord record = new DynamicPriceRecord();
         record.setEventId(eventId);
-        record.setComputedPrice(price);
-        record.setAppliedRuleCodes(appliedRules.toString());
+        record.setComputedPrice(finalPrice);
+        record.setAppliedRuleCodes(appliedRules.isEmpty() ? "NONE" : appliedRules);
 
-        priceRepo.save(record);
+        dynamicPriceRecordRepository.save(record);
 
-        return price;
+        return finalPrice;
+    }
+
+    @Override
+    public DynamicPriceRecord getLatestPrice(Long eventId) {
+        return dynamicPriceRecordRepository
+                .findTopByEventIdOrderByIdDesc(eventId)
+                .orElseThrow(() -> new RuntimeException("No price found"));
+    }
+
+    @Override
+    public List<DynamicPriceRecord> getPriceHistory(Long eventId) {
+        return dynamicPriceRecordRepository.findByEventId(eventId);
+    }
+
+    @Override
+    public List<DynamicPriceRecord> getAllComputedPrices() {
+        return dynamicPriceRecordRepository.findAll();
     }
 }
