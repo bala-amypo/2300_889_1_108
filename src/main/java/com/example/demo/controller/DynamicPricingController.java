@@ -1,20 +1,21 @@
 package com.example.demo.controller;
 
 import com.example.demo.service.DynamicPricingEngineService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/dynamic-price")
+@RequestMapping("/api/pricing")
 public class DynamicPricingController {
 
-    @Autowired
-    private DynamicPricingEngineService service;
+    private final DynamicPricingEngineService service;
+
+    public DynamicPricingController(DynamicPricingEngineService service) {
+        this.service = service;
+    }
 
     @GetMapping("/{eventId}")
-    public ResponseEntity<Double> getDynamicPrice(@PathVariable Long eventId) {
-        double price = service.calculateDynamicPrice(eventId);
-        return ResponseEntity.ok(price);
+    public ResponseEntity<Double> getDynamicPrice(@PathVariable long eventId) {
+        return ResponseEntity.ok(service.calculateDynamicPrice(eventId));
     }
 }
