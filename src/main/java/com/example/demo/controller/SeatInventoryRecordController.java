@@ -1,40 +1,48 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.SeatInventoryRecord;
-import com.example.demo.service.SeatInventoryService;
+import com.example.demo.service.SeatInventoryRecordService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/inventory")
+@RequestMapping("/api/seat-inventory")
 public class SeatInventoryRecordController {
 
-    private final SeatInventoryRecordService service;
+    private final SeatInventoryRecordService seatInventoryRecordService;
 
-    public SeatInventoryRecordController(SeatInventoryRecordService service) {
-        this.service = service;
+    public SeatInventoryRecordController(SeatInventoryRecordService seatInventoryRecordService) {
+        this.seatInventoryRecordService = seatInventoryRecordService;
     }
 
     @PostMapping
-    public SeatInventoryRecord create(@RequestBody SeatInventoryRecord record) {
-        return service.createInventory(record);
+    public ResponseEntity<SeatInventoryRecord> create(@RequestBody SeatInventoryRecord record) {
+        return ResponseEntity.ok(seatInventoryRecordService.createSeatInventory(record));
     }
 
-    @PutMapping("/{eventId}/remaining")
-    public SeatInventoryRecord updateRemaining(@PathVariable Long eventId,
-                                               @RequestParam Integer remaining) {
-        return service.updateRemainingSeats(eventId, remaining);
-    }
-
-    @GetMapping("/event/{eventId}")
-    public SeatInventoryRecord getByEvent(@PathVariable Long eventId) {
-        return service.getInventoryByEvent(eventId)
-                .orElseThrow();
+    @GetMapping("/{id}")
+    public ResponseEntity<SeatInventoryRecord> getById(@PathVariable Long id) {
+        return seatInventoryRecordService.getSeatInventoryById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping
-    public List<SeatInventoryRecord> getAll() {
-        return service.getAllInventories();
+    public ResponseEntity<List<SeatInventoryRecord>> getAll() {
+        return ResponseEntity.ok(seatInventoryRecordService.getAllSeatInventories());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<SeatInventoryRecord> update(@PathVariable Long id,
+                                                      @RequestBody SeatInventoryRecord record) {
+        return ResponseEntity.ok(seatInventoryRecordService.updateSeatInventory(id, record));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        seatInventoryRecordService.deleteSeatInventory(id);
+        return ResponseEntity.noContent().build();
     }
 }
