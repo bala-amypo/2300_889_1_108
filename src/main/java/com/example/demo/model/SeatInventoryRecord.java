@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "seat_inventory_records")
+@Table(name = "seat_inventory")
 public class SeatInventoryRecord {
 
     @Id
@@ -12,25 +12,24 @@ public class SeatInventoryRecord {
     private Long id;
 
     private Long eventId;
-    private int totalSeats;
-    private int remainingSeats;
+    private Integer totalSeats;
+    private Integer remainingSeats;
 
     private LocalDateTime updatedAt;
 
     @PreUpdate
     public void preUpdate() {
-        this.updatedAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
 
-    public int getRemainingSeats() {
-        return remainingSeats;
-    }
+    public Long getEventId() { return eventId; }
+    public void setEventId(Long eventId) { this.eventId = eventId; }
 
-    public Long getEventId() {
-        return eventId;
-    }
+    public Integer getTotalSeats() { return totalSeats; }
+    public void setTotalSeats(Integer totalSeats) { this.totalSeats = totalSeats; }
 
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
+    public Integer getRemainingSeats() { return remainingSeats; }
+    public void setRemainingSeats(Integer remainingSeats) { this.remainingSeats = remainingSeats; }
+
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
 }

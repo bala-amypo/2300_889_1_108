@@ -11,18 +11,19 @@ public class PriceAdjustmentLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private long eventId;
-    private double oldPrice;
-    private double newPrice;
+    private Long eventId;
+    private Double oldPrice;
+    private Double newPrice;
 
     private LocalDateTime changedAt;
 
     @PrePersist
     public void prePersist() {
-        this.changedAt = LocalDateTime.now();
+        changedAt = LocalDateTime.now();
     }
 
-    public LocalDateTime getChangedAt() {
-        return changedAt;
-    }
+    public void setEventId(Long eventId) { this.eventId = eventId; }
+    public void setOldPrice(Double oldPrice) { this.oldPrice = oldPrice; }
+    public void setNewPrice(Double newPrice) { this.newPrice = newPrice; }
+    public void setChangedAt(LocalDateTime changedAt) { this.changedAt = changedAt; }
 }

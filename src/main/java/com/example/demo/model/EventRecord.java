@@ -17,57 +17,31 @@ public class EventRecord {
     private LocalDate eventDate;
     private Double basePrice;
 
-    private boolean active;
+    private Boolean active;
 
-    public Long getId() {
-        return id;
+    @PrePersist
+    public void prePersist() {
+        if (active == null) active = true;
     }
 
-    public String getEventCode() {
-        return eventCode;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setEventCode(String eventCode) {
-        this.eventCode = eventCode;
-    }
+    public String getEventCode() { return eventCode; }
+    public void setEventCode(String eventCode) { this.eventCode = eventCode; }
 
-    public String getEventName() {
-        return eventName;
-    }
+    public String getEventName() { return eventName; }
+    public void setEventName(String eventName) { this.eventName = eventName; }
 
-    public void setEventName(String eventName) {
-        this.eventName = eventName;
-    }
+    public String getVenue() { return venue; }
+    public void setVenue(String venue) { this.venue = venue; }
 
-    public String getVenue() {
-        return venue;
-    }
+    public LocalDate getEventDate() { return eventDate; }
+    public void setEventDate(LocalDate eventDate) { this.eventDate = eventDate; }
 
-    public void setVenue(String venue) {
-        this.venue = venue;
-    }
+    public Double getBasePrice() { return basePrice; }
+    public void setBasePrice(Double basePrice) { this.basePrice = basePrice; }
 
-    public LocalDate getEventDate() {
-        return eventDate;
-    }
-
-    public void setEventDate(LocalDate eventDate) {
-        this.eventDate = eventDate;
-    }
-
-    public Double getBasePrice() {
-        return basePrice;
-    }
-
-    public void setBasePrice(Double basePrice) {
-        this.basePrice = basePrice;
-    }
-
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
+    public Boolean getActive() { return active; }
+    public void setActive(Boolean active) { this.active = active; }
 }
