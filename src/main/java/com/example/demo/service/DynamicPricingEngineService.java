@@ -5,7 +5,7 @@ import java.util.List;
 
 public interface DynamicPricingEngineService {
 
-    double calculateDynamicPrice(long eventId);
+    double computeDynamicPrice(long eventId);
 
     DynamicPriceRecord getLatestPrice(Long eventId);
 
