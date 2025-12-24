@@ -1,13 +1,10 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "seat_inventory_records")
-@Getter
-@Setter
 public class SeatInventoryRecord {
 
     @Id
@@ -15,8 +12,25 @@ public class SeatInventoryRecord {
     private Long id;
 
     private Long eventId;
+    private int totalSeats;
+    private int remainingSeats;
 
-    private Integer totalSeats;
+    private LocalDateTime updatedAt;
 
-    private Integer remainingSeats;
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public int getRemainingSeats() {
+        return remainingSeats;
+    }
+
+    public Long getEventId() {
+        return eventId;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
 }
