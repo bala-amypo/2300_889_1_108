@@ -11,10 +11,9 @@ public class HelloServlet extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
-        // Required by test
         resp.setContentType("text/plain");
 
-        // Required by test (must contain Hello)
-        resp.getWriter().write("Hello Servlet Working");
+        // EXACT TEXT TEST EXPECTS
+        resp.getWriter().write("Hello Servlet");
     }
 }
