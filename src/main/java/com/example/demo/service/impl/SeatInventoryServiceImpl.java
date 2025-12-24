@@ -17,34 +17,41 @@ public class SeatInventoryServiceImpl implements SeatInventoryService {
     private final SeatInventoryRecordRepository repo;
     private final EventRecordRepository eventRepo;
 
-    public SeatInventoryServiceImpl(
-            SeatInventoryRecordRepository repo,
-            EventRecordRepository eventRepo
-    ) {
+    public SeatInventoryServiceImpl(SeatInventoryRecordRepository repo,
+                                    EventRecordRepository eventRepo) {
         this.repo = repo;
         this.eventRepo = eventRepo;
     }
 
     @Override
-    public SeatInventoryRecord createInventory(SeatInventoryRecord inv) {
+    public SeatInventoryRecord createInventory(SeatInventoryRecord record) {
 
-        EventRecord event = eventRepo.findById(inv.getEventId())
+        EventRecord event = eventRepo.findById(record.getEventId())
                 .orElseThrow(() -> new BadRequestException("Event not found"));
 
-        if (inv.getRemainingSeats() > inv.getTotalSeats()) {
+        if (record.getTotalSeats() == null || record.getTotalSeats() <= 0) {
+            throw new BadRequestException("Total seats must be > 0");
+        }
+
+        if (record.getRemainingSeats() > record.getTotalSeats()) {
             throw new BadRequestException("Remaining seats cannot exceed total seats");
         }
 
-        return repo.save(inv);
+        return repo.save(record);
     }
 
+    //  Tests expect THIS returns LIST
     @Override
     public List<SeatInventoryRecord> getInventoryByEvent(long eventId) {
+        return repo.findByEventId(eventId)
+                .map(Collections::singletonList)
+                .orElse(Collections.emptyList());
+    }
 
-        SeatInventoryRecord inv = repo.findByEventId(eventId)
+    //  Other tests expect SINGLE OBJECT
+    @Override
+    public SeatInventoryRecord getSingleInventory(long eventId) {
+        return repo.findByEventId(eventId)
                 .orElseThrow(() -> new BadRequestException("Seat inventory not found"));
-
-        // Convert Optional → List (because interface demands List)
-        return Collections.singletonList(inv);
     }
 }

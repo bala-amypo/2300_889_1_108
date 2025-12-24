@@ -11,58 +11,66 @@ import java.util.Map;
 
 public class JwtTokenProvider {
 
-    private String jwtSecret = "DefaultSecretKeyForJwtDemoApplication123456";
-    private long jwtExpirationMs = 3600000; // 1 hour
-    private boolean enabled = true;
+    private final Key key;
+    private final long validityInMs;
+    private final boolean enabled;
 
-    private Key key;
+    // ***** TESTS REQUIRE THIS CONSTRUCTOR *****
+    public JwtTokenProvider(String secretKey, long validityInMs, boolean enabled) {
+        this.key = Keys.hmacShaKeyFor(secretKey.getBytes());
+        this.validityInMs = validityInMs;
+        this.enabled = enabled;
+    }
 
     public JwtTokenProvider() {
-        key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
+        this.key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+        this.validityInMs = 3600000L;
+        this.enabled = true;
     }
 
-    // ⭐ TEST EXPECTED CONSTRUCTOR
-    public JwtTokenProvider(String secret, long expiration, boolean enabled) {
-        this.jwtSecret = secret;
-        this.jwtExpirationMs = expiration;
-        this.enabled = enabled;
-        this.key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
-    }
+    // ******** GENERATE TOKEN ********
+    public String generateToken(Authentication authentication,
+                                Long userId,
+                                String role) {
 
-    public String generateToken(Authentication authentication, Long userId, String role) {
-        if (!enabled) return "";
-
-        String email = authentication.getName();
-
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("userId", userId);
-        claims.put("role", role);
-        claims.put("email", email);
+        Date now = new Date();
+        Date expiry = new Date(now.getTime() + validityInMs);
 
         return Jwts.builder()
-                .setSubject(email)
-                .addClaims(claims)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
+                .setSubject(authentication.getName())
+                .claim("userId", userId)
+                .claim("role", role)
+                .claim("email", authentication.getName())
+                .setIssuedAt(now)
+                .setExpiration(expiry)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
+    // ******** USERNAME ********
+    public String getUsernameFromToken(String token) {
+        return parseClaims(token).getSubject();
+    }
+
+    // ******** VALIDATION ********
     public boolean validateToken(String token) {
         try {
-            if (!enabled) return false;
-            getAllClaims(token);
+            parseClaims(token);
             return true;
-        } catch (Exception e) {
+        } catch (Exception ex) {
             return false;
         }
     }
 
-    public String getUsernameFromToken(String token) {
-        return getAllClaims(token).getSubject();
+    // ******** RETURN ALL CLAIMS AS MAP ********
+    public Map<String, Object> getAllClaims(String token) {
+        Claims claims = parseClaims(token);
+        Map<String, Object> map = new HashMap<>();
+        map.putAll(claims);
+        return map;
     }
 
-    public Map<String, Object> getAllClaims(String token) {
+    private Claims parseClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()

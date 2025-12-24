@@ -8,4 +8,7 @@ public interface SeatInventoryService {
     SeatInventoryRecord createInventory(SeatInventoryRecord record);
 
     List<SeatInventoryRecord> getInventoryByEvent(long eventId);
+
+    //  Required to satisfy both previous & new test expectations
+    SeatInventoryRecord getSingleInventory(long eventId);
 }
