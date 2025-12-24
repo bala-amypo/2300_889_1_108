@@ -5,10 +5,11 @@ import java.util.List;
 
 public interface SeatInventoryService {
 
-    SeatInventoryRecord createInventory(SeatInventoryRecord record);
+    SeatInventoryRecord createInventory(SeatInventoryRecord inv);
 
-    List<SeatInventoryRecord> getInventoryByEvent(long eventId);
+    // MUST return single object
+    SeatInventoryRecord getInventoryByEvent(long eventId);
 
-    //  Required to satisfy both previous & new test expectations
-    SeatInventoryRecord getSingleInventory(long eventId);
+    // Optional helper if you still need list anywhere
+    List<SeatInventoryRecord> getAllInventories();
 }
