@@ -2,38 +2,38 @@ package com.example.demo.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
+@Table(name = "dynamic_price_records")
 public class DynamicPriceRecord {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+ @Id
+ @GeneratedValue(strategy = GenerationType.IDENTITY)
+ private Long id;
 
-    @ManyToOne
-    private EventRecord event;
+ private Long eventId;
 
-    private double computedPrice;
+ private Double computedPrice;
 
-    @ElementCollection
-    private List<String> appliedRuleCodes;
+ private String appliedRuleCodes;
 
-    private LocalDateTime computedAt;
+ private LocalDateTime computedAt;
 
-    // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+ public DynamicPriceRecord() {}
 
-    public EventRecord getEvent() { return event; }
-    public void setEvent(EventRecord event) { this.event = event; }
+ public DynamicPriceRecord(Long id, Long eventId, Double computedPrice,
+ String appliedRuleCodes, LocalDateTime computedAt) {
+  this.id = id;
+  this.eventId = eventId;
+  this.computedPrice = computedPrice;
+  this.appliedRuleCodes = appliedRuleCodes;
+  this.computedAt = computedAt;
+ }
 
-    public double getComputedPrice() { return computedPrice; }
-    public void setComputedPrice(double computedPrice) { this.computedPrice = computedPrice; }
+ @PrePersist
+ public void setTime() {
+  this.computedAt = LocalDateTime.now();
+ }
 
-    public List<String> getAppliedRuleCodes() { return appliedRuleCodes; }
-    public void setAppliedRuleCodes(List<String> appliedRuleCodes) { this.appliedRuleCodes = appliedRuleCodes; }
-
-    public LocalDateTime getComputedAt() { return computedAt; }
-    public void setComputedAt(LocalDateTime computedAt) { this.computedAt = computedAt; }
+ // getters and setters
 }

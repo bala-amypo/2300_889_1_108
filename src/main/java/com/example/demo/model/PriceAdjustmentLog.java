@@ -4,36 +4,39 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "price_adjustment_logs")
 public class PriceAdjustmentLog {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+ @Id
+ @GeneratedValue(strategy = GenerationType.IDENTITY)
+ private Long id;
 
-    @ManyToOne
-    private EventRecord event;
+ private Long eventId;
 
-    private double oldPrice;
-    private double newPrice;
-    private String reason;
-    private LocalDateTime adjustedAt;
+ private Double oldPrice;
 
-    // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+ private Double newPrice;
 
-    public EventRecord getEvent() { return event; }
-    public void setEvent(EventRecord event) { this.event = event; }
+ private String reason;
 
-    public double getOldPrice() { return oldPrice; }
-    public void setOldPrice(double oldPrice) { this.oldPrice = oldPrice; }
+ private LocalDateTime changedAt;
 
-    public double getNewPrice() { return newPrice; }
-    public void setNewPrice(double newPrice) { this.newPrice = newPrice; }
+ public PriceAdjustmentLog() {}
 
-    public String getReason() { return reason; }
-    public void setReason(String reason) { this.reason = reason; }
+ public PriceAdjustmentLog(Long id, Long eventId, Double oldPrice,
+ Double newPrice, String reason, LocalDateTime changedAt) {
+  this.id = id;
+  this.eventId = eventId;
+  this.oldPrice = oldPrice;
+  this.newPrice = newPrice;
+  this.reason = reason;
+  this.changedAt = changedAt;
+ }
 
-    public LocalDateTime getAdjustedAt() { return adjustedAt; }
-    public void setAdjustedAt(LocalDateTime adjustedAt) { this.adjustedAt = adjustedAt; }
+ @PrePersist
+ public void setTime() {
+  this.changedAt = LocalDateTime.now();
+ }
+
+ // getters and setters
 }

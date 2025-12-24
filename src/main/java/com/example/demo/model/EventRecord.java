@@ -2,37 +2,61 @@ package com.example.demo.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "event_records")
 public class EventRecord {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+ @Id
+ @GeneratedValue(strategy = GenerationType.IDENTITY)
+ private Long id;
 
-    @Column(unique = true, nullable = false)
-    private String eventCode;
+ @Column(unique = true, nullable = false)
+ private String eventCode;
 
-    @Column(nullable = false)
-    private double basePrice;
+ private String eventName;
 
-    @Column(nullable = false)
-    private boolean active;
+ private String venue;
 
-    @Column(nullable = false)
-    private LocalDate eventDate;
+ private LocalDate eventDate;
 
-    // getters and setters
-    public Long getId() { return id; }
-    public String getEventCode() { return eventCode; }
-    public double getBasePrice() { return basePrice; }
-    public boolean getActive() { return active; }
-    public LocalDate getEventDate() { return eventDate; }
+ private Double basePrice;
 
-    public void setId(Long id) { this.id = id; }
-    public void setEventCode(String eventCode) { this.eventCode = eventCode; }
-    public void setBasePrice(double basePrice) { this.basePrice = basePrice; }
-    public void setActive(boolean active) { this.active = active; }
-    public void setEventDate(LocalDate eventDate) { this.eventDate = eventDate; }
+ private LocalDateTime createdAt;
+
+ private Boolean active = true;
+
+ @OneToMany(mappedBy = "eventId", cascade = CascadeType.ALL, orphanRemoval = false)
+ private List<SeatInventoryRecord> seatInventories;
+
+ @OneToMany(mappedBy = "eventId", cascade = CascadeType.ALL, orphanRemoval = false)
+ private List<DynamicPriceRecord> priceRecords;
+
+ @OneToMany(mappedBy = "eventId", cascade = CascadeType.ALL, orphanRemoval = false)
+ private List<PriceAdjustmentLog> adjustmentLogs;
+
+ public EventRecord() {}
+
+ public EventRecord(Long id, String eventCode, String eventName, String venue,
+ LocalDate eventDate, Double basePrice, LocalDateTime createdAt, Boolean active) {
+  this.id = id;
+  this.eventCode = eventCode;
+  this.eventName = eventName;
+  this.venue = venue;
+  this.eventDate = eventDate;
+  this.basePrice = basePrice;
+  this.createdAt = createdAt;
+  this.active = active;
+ }
+
+ @PrePersist
+ public void setCreatedAt() {
+  this.createdAt = LocalDateTime.now();
+  if (this.active == null)
+   this.active = true;
+ }
+
+ // getters and setters
 }
