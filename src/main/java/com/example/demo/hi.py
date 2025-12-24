@@ -20,3 +20,4 @@ while True:
         except Exception as e:
             print(f"Error: {e}")
     time.sleep(0.5)
+    
