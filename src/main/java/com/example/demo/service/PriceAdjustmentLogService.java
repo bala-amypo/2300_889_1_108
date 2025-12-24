@@ -10,4 +10,8 @@ public interface PriceAdjustmentLogService {
     List<PriceAdjustmentLog> getAllAdjustments();
 
     PriceAdjustmentLog saveLog(PriceAdjustmentLog log);
+
+    PriceAdjustmentLog logAdjustment(PriceAdjustmentLog log);
+
+    List<PriceAdjustmentLog> getAdjustmentsByEvent(Long eventId);
 }

@@ -58,10 +58,13 @@ public class DynamicPricingEngineServiceImpl implements DynamicPricingEngineServ
         StringBuilder applied = new StringBuilder();
 
         for (PricingRule r : rules) {
-            boolean seatMatch = remainingSeats >= r.getMinRemainingSeats()
+
+            boolean seatMatch =
+                    remainingSeats >= r.getMinRemainingSeats()
                     && remainingSeats <= r.getMaxRemainingSeats();
 
-            boolean dayMatch = daysLeft <= r.getDaysBeforeEvent();
+            boolean dayMatch =
+                    daysLeft <= r.getDaysBeforeEvent();
 
             if (seatMatch && dayMatch) {
                 price = price * r.getPriceMultiplier();
@@ -90,5 +93,17 @@ public class DynamicPricingEngineServiceImpl implements DynamicPricingEngineServ
     @Override
     public List<DynamicPriceRecord> getAllComputedPrices() {
         return dynamicPriceRepository.findAll();
+    }
+
+    @Override
+    public DynamicPriceRecord getLatestPrice(Long eventId) {
+        return dynamicPriceRepository
+                .findTopByEventIdOrderByIdDesc(eventId)
+                .orElseThrow(() -> new RuntimeException("No price found"));
+    }
+
+    @Override
+    public List<DynamicPriceRecord> getPriceHistory(Long eventId) {
+        return dynamicPriceRepository.findByEventId(eventId);
     }
 }
