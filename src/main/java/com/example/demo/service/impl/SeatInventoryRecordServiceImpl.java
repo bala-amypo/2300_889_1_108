@@ -1,57 +1,18 @@
-package com.example.demo.service.impl;
+package com.example.demo.service;
 
 import com.example.demo.model.SeatInventoryRecord;
-import com.example.demo.repository.SeatInventoryRecordRepository;
-import com.example.demo.service.SeatInventoryRecordService;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
+import java.util.Optional;
 
-@Service
-public class SeatInventoryRecordServiceImpl implements SeatInventoryRecordService {
+public interface SeatInventoryRecordService {
 
-    private final SeatInventoryRecordRepository repository;
+    SeatInventoryRecord createSeatInventory(SeatInventoryRecord record);
 
-    public SeatInventoryRecordServiceImpl(SeatInventoryRecordRepository repository) {
-        this.repository = repository;
-    }
+    Optional<SeatInventoryRecord> getSeatInventoryById(Long id);
 
-    @Override
-    public SeatInventoryRecord create(SeatInventoryRecord inventory) {
-        return repository.save(inventory);
-    }
+    List<SeatInventoryRecord> getAllSeatInventories();
 
-    @Override
-    public SeatInventoryRecord getById(Long id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Seat Inventory not found"));
-    }
+    SeatInventoryRecord updateSeatInventory(Long id, SeatInventoryRecord updated);
 
-    @Override
-    public List<SeatInventoryRecord> getAll() {
-        return repository.findAll();
-    }
-
-    @Override
-    public SeatInventoryRecord update(Long id, SeatInventoryRecord updated) {
-        SeatInventoryRecord record = getById(id);
-
-        record.setEventId(updated.getEventId());
-        record.setTotalSeats(updated.getTotalSeats());
-        record.setRemainingSeats(updated.getRemainingSeats());
-
-        return repository.save(record);
-    }
-
-    @Override
-    public void delete(Long id) {
-        repository.deleteById(id);
-    }
-
-    @Override
-    public SeatInventoryRecord updateRemainingSeats(Long id, Integer seats) {
-        SeatInventoryRecord record = getById(id);
-        record.setRemainingSeats(seats);
-        return repository.save(record);
-    }
+    void deleteSeatInventory(Long id);
 }

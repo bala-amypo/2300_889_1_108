@@ -1,44 +1,27 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "pricing_rules")
+@Getter
+@Setter
 public class PricingRule {
 
- @Id
- @GeneratedValue(strategy = GenerationType.IDENTITY)
- private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
- @Column(unique = true, nullable = false)
- private String ruleCode;
+    private String ruleCode;
+    private String description;
+    private Boolean active;
 
- private String description;
+    private Integer minRemainingSeats;
+    private Integer maxRemainingSeats;
 
- private Integer minRemainingSeats;
+    private Integer daysBeforeEvent;
 
- private Integer maxRemainingSeats;
-
- private Integer daysBeforeEvent;
-
- private Double priceMultiplier;
-
- private Boolean active;
-
- public PricingRule() {}
-
- public PricingRule(Long id, String ruleCode, String description,
- Integer minRemainingSeats, Integer maxRemainingSeats,
- Integer daysBeforeEvent, Double priceMultiplier, Boolean active) {
-  this.id = id;
-  this.ruleCode = ruleCode;
-  this.description = description;
-  this.minRemainingSeats = minRemainingSeats;
-  this.maxRemainingSeats = maxRemainingSeats;
-  this.daysBeforeEvent = daysBeforeEvent;
-  this.priceMultiplier = priceMultiplier;
-  this.active = active;
- }
-
- // getters and setters
+    private Double priceMultiplier;
 }
