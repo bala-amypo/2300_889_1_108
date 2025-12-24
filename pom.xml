@@ -94,43 +94,29 @@
 
     </dependencies>
 
-    <build>
-        <plugins>
-            <!-- Spring Boot Maven Plugin -->
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
+   <build>
+    <plugins>
 
-            <!-- Surefire Plugin for TestNG -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.2.5</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.apache.maven.surefire</groupId>
-                        <artifactId>surefire-testng</artifactId>
-                        <version>3.2.5</version>
-                    </dependency>
-                    <dependency>
-    <groupId>org.mockito</groupId>
-    <artifactId>mockito-core</artifactId>
-    <version>5.8.0</version>
-    <scope>test</scope>
-</dependency>
-<dependencies>
-    <dependency>
-        <groupId>org.mockito</groupId>
-        <artifactId>mockito-core</artifactId>
-        <version>5.8.0</version>
-        <scope>test</scope>
-    </dependency>
-</dependencies>
+        <!-- Spring Boot Plugin -->
+        <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+        </plugin>
 
-                </dependencies>
-            </plugin>
-        </plugins>
-    </build>
+        <!-- Surefire Plugin (TestNG Support) -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>3.2.5</version>
+            <dependencies>
+                <dependency>
+                    <groupId>org.apache.maven.surefire</groupId>
+                    <artifactId>surefire-testng</artifactId>
+                    <version>3.2.5</version>
+                </dependency>
+            </dependencies>
+        </plugin>
 
+    </plugins>
+</build>
 </project>
