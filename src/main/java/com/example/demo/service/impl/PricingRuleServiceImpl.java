@@ -1,58 +1,57 @@
 package com.example.demo.service.impl;
 
+import com.example.demo.exception.BadRequestException;
 import com.example.demo.model.PricingRule;
 import com.example.demo.repository.PricingRuleRepository;
 import com.example.demo.service.PricingRuleService;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class PricingRuleServiceImpl implements PricingRuleService {
 
-    private final PricingRuleRepository pricingRuleRepository;
+ private final PricingRuleRepository ruleRepository;
 
-    public PricingRuleServiceImpl(PricingRuleRepository pricingRuleRepository) {
-        this.pricingRuleRepository = pricingRuleRepository;
-    }
+ public PricingRuleServiceImpl(PricingRuleRepository ruleRepository) {
+  this.ruleRepository = ruleRepository;
+ }
 
-    @Override
-    public PricingRule createRule(PricingRule rule) {
-        if (pricingRuleRepository.existsByRuleCode(rule.getRuleCode())) {
-            throw new RuntimeException("Pricing rule with code already exists");
-        }
-        return pricingRuleRepository.save(rule);
-    }
+ @Override
+ public PricingRule createRule(PricingRule rule) {
+  if (ruleRepository.existsByRuleCode(rule.getRuleCode()))
+   throw new BadRequestException("Duplicate rule code");
 
-    @Override
-    public PricingRule updateRule(Long id, PricingRule updatedRule) {
+  if (rule.getPriceMultiplier() == null || rule.getPriceMultiplier() <= 0)
+   throw new BadRequestException("Price multiplier must be > 0");
 
-        PricingRule existing = pricingRuleRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Pricing rule not found"));
+  return ruleRepository.save(rule);
+ }
 
-        existing.setDescription(updatedRule.getDescription());
-        existing.setMinRemainingSeats(updatedRule.getMinRemainingSeats());
-        existing.setMaxRemainingSeats(updatedRule.getMaxRemainingSeats());
-        existing.setDaysBeforeEvent(updatedRule.getDaysBeforeEvent());
-        existing.setPriceMultiplier(updatedRule.getPriceMultiplier());
-        existing.setActive(updatedRule.getActive());
+ @Override
+ public PricingRule updateRule(Long id, PricingRule updatedRule) {
+  PricingRule rule = ruleRepository.findById(id).orElseThrow();
+  rule.setDescription(updatedRule.getDescription());
+  rule.setActive(updatedRule.getActive());
+  rule.setDaysBeforeEvent(updatedRule.getDaysBeforeEvent());
+  rule.setMinRemainingSeats(updatedRule.getMinRemainingSeats());
+  rule.setMaxRemainingSeats(updatedRule.getMaxRemainingSeats());
+  rule.setPriceMultiplier(updatedRule.getPriceMultiplier());
+  return ruleRepository.save(rule);
+ }
 
-        return pricingRuleRepository.save(existing);
-    }
+ @Override
+ public List<PricingRule> getActiveRules() {
+  return ruleRepository.findByActiveTrue();
+ }
 
-    @Override
-    public Optional<PricingRule> getRuleById(Long id) {
-        return pricingRuleRepository.findById(id);
-    }
+ @Override
+ public Optional<PricingRule> getRuleByCode(String ruleCode) {
+  return ruleRepository.findByRuleCode(ruleCode);
+ }
 
-    @Override
-    public List<PricingRule> getActiveRules() {
-        return pricingRuleRepository.findByActiveTrue();
-    }
-
-    @Override
-    public List<PricingRule> getAllRules() {
-        return pricingRuleRepository.findAll();
-    }
+ @Override
+ public List<PricingRule> getAllRules() {
+  return ruleRepository.findAll();
+ }
 }

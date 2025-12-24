@@ -1,56 +1,39 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.SeatInventoryRecord;
-import com.example.demo.service.SeatInventoryRecordService;
-import org.springframework.http.ResponseEntity;
+import com.example.demo.service.SeatInventoryService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/inventory")
-public class SeatInventoryRecordController {
+public class SeatInventoryController {
 
-    private final SeatInventoryRecordService inventoryService;
+ private final SeatInventoryService service;
 
-    public SeatInventoryRecordController(SeatInventoryRecordService inventoryService) {
-        this.inventoryService = inventoryService;
-    }
+ public SeatInventoryController(SeatInventoryService service) {
+  this.service = service;
+ }
 
-    // POST /api/inventory
-    @PostMapping
-    public ResponseEntity<SeatInventoryRecord> createInventory(
-            @RequestBody SeatInventoryRecord inventory) {
+ @PostMapping
+ public SeatInventoryRecord create(@RequestBody SeatInventoryRecord record) {
+  return service.createInventory(record);
+ }
 
-        SeatInventoryRecord created = inventoryService.createInventory(inventory);
-        return ResponseEntity.ok(created);
-    }
+ @PutMapping("/{eventId}/remaining")
+ public SeatInventoryRecord updateRemaining(@PathVariable Long eventId,
+                                            @RequestParam Integer remaining) {
+  return service.updateRemainingSeats(eventId, remaining);
+ }
 
-    // PUT /api/inventory/{eventId}/remaining?seats=100
-    @PutMapping("/{eventId}/remaining")
-    public ResponseEntity<SeatInventoryRecord> updateRemainingSeats(
-            @PathVariable Long eventId,
-            @RequestParam int seats) {
+ @GetMapping("/event/{eventId}")
+ public SeatInventoryRecord getByEvent(@PathVariable Long eventId) {
+  return service.getInventoryByEvent(eventId).orElseThrow();
+ }
 
-        SeatInventoryRecord updated =
-                inventoryService.updateRemainingSeats(eventId, seats);
-
-        return ResponseEntity.ok(updated);
-    }
-
-    // GET /api/inventory/event/{eventId}
-    @GetMapping("/event/{eventId}")
-    public ResponseEntity<SeatInventoryRecord> getByEvent(
-            @PathVariable Long eventId) {
-
-        return inventoryService.getByEventId(eventId)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    // GET /api/inventory
-    @GetMapping
-    public ResponseEntity<List<SeatInventoryRecord>> getAllInventories() {
-        return ResponseEntity.ok(inventoryService.getAllInventories());
-    }
+ @GetMapping
+ public List<SeatInventoryRecord> getAll() {
+  return service.getAllInventories();
+ }
 }

@@ -2,60 +2,32 @@ package com.example.demo.controller;
 
 import com.example.demo.model.PriceAdjustmentLog;
 import com.example.demo.service.PriceAdjustmentLogService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/price-adjustments")
 public class PriceAdjustmentLogController {
 
-    private final PriceAdjustmentLogService logService;
+ private final PriceAdjustmentLogService service;
 
-    public PriceAdjustmentLogController(PriceAdjustmentLogService logService) {
-        this.logService = logService;
-    }
+ public PriceAdjustmentLogController(PriceAdjustmentLogService service) {
+  this.service = service;
+ }
 
-    // POST /api/price-adjustments
-    @PostMapping
-    public ResponseEntity<PriceAdjustmentLog> logAdjustment(
-            @RequestBody PriceAdjustmentLog log) {
+ @PostMapping
+ public PriceAdjustmentLog log(@RequestBody PriceAdjustmentLog log) {
+  return service.logAdjustment(log);
+ }
 
-        PriceAdjustmentLog savedLog = logService.logAdjustment(log);
-        return ResponseEntity.ok(savedLog);
-    }
+ @GetMapping("/event/{eventId}")
+ public List<PriceAdjustmentLog> getByEvent(@PathVariable Long eventId) {
+  return service.getAdjustmentsByEvent(eventId);
+ }
 
-    // GET /api/price-adjustments/event/{eventId}
-    @GetMapping("/event/{eventId}")
-    public ResponseEntity<List<PriceAdjustmentLog>> getByEvent(
-            @PathVariable Long eventId) {
-
-        List<PriceAdjustmentLog> logs =
-                logService.getAdjustmentsByEvent(eventId);
-
-        return ResponseEntity.ok(logs);
-    }
-
-    // GET /api/price-adjustments
-    @GetMapping
-    public ResponseEntity<List<PriceAdjustmentLog>> getAll() {
-        return ResponseEntity.ok(logService.getAllAdjustments());
-    }
-
-    // GET /api/price-adjustments/{id}
-    @GetMapping("/{id}")
-    public ResponseEntity<PriceAdjustmentLog> getById(
-            @PathVariable Long id) {
-
-        Optional<PriceAdjustmentLog> log =
-                logService.getAllAdjustments()
-                        .stream()
-                        .filter(l -> l.getId().equals(id))
-                        .findFirst();
-
-        return log.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
-    }
+ @GetMapping
+ public List<PriceAdjustmentLog> all() {
+  return service.getAllAdjustments();
+ }
 }
