@@ -8,32 +8,33 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/inventory")
-public class SeatInventoryController {
+public class SeatInventoryRecordController {
 
- private final SeatInventoryService service;
+    private final SeatInventoryService service;
 
- public SeatInventoryController(SeatInventoryService service) {
-  this.service = service;
- }
+    public SeatInventoryRecordController(SeatInventoryService service) {
+        this.service = service;
+    }
 
- @PostMapping
- public SeatInventoryRecord create(@RequestBody SeatInventoryRecord record) {
-  return service.createInventory(record);
- }
+    @PostMapping
+    public SeatInventoryRecord create(@RequestBody SeatInventoryRecord record) {
+        return service.createInventory(record);
+    }
 
- @PutMapping("/{eventId}/remaining")
- public SeatInventoryRecord updateRemaining(@PathVariable Long eventId,
-                                            @RequestParam Integer remaining) {
-  return service.updateRemainingSeats(eventId, remaining);
- }
+    @PutMapping("/{eventId}/remaining")
+    public SeatInventoryRecord updateRemaining(@PathVariable Long eventId,
+                                               @RequestParam Integer remaining) {
+        return service.updateRemainingSeats(eventId, remaining);
+    }
 
- @GetMapping("/event/{eventId}")
- public SeatInventoryRecord getByEvent(@PathVariable Long eventId) {
-  return service.getInventoryByEvent(eventId).orElseThrow();
- }
+    @GetMapping("/event/{eventId}")
+    public SeatInventoryRecord getByEvent(@PathVariable Long eventId) {
+        return service.getInventoryByEvent(eventId)
+                .orElseThrow();
+    }
 
- @GetMapping
- public List<SeatInventoryRecord> getAll() {
-  return service.getAllInventories();
- }
+    @GetMapping
+    public List<SeatInventoryRecord> getAll() {
+        return service.getAllInventories();
+    }
 }
