@@ -1,21 +1,13 @@
 package com.example.demo.service;
 
 import com.example.demo.model.User;
-
-import java.util.List;
+import java.util.Optional;
 
 public interface UserService {
 
-    User createUser(User user);
+ User save(User user);
 
-    User getUserById(Long id);
+ Optional<User> findByEmail(String email);
 
-    User getUserByEmail(String email);
-
-    List<User> getAllUsers();
-
-    // Authentication methods
-    boolean register(User user);
-
-    boolean login(String username, String password);
+ boolean existsByEmail(String email);
 }
