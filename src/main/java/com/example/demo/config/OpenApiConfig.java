@@ -14,7 +14,7 @@ public class OpenApiConfig {
         return new OpenAPI()
                 // You need to change the port as per your server
                 .servers(List.of(
-                        new Server().url("https://7417f02de787-8324.pro604cr.amypo.ai/proxy/9001/")
+                        new Server().url("https://9243.pro604cr.amypo.ai/")
                 ));
         }
 }
