@@ -13,6 +13,6 @@ public class HelloServlet extends HttpServlet {
         resp.setContentType("text/plain");
         PrintWriter out = response.getWriter();
         out.write("Hello from Dynamic Event Ticket Pricing Engine Servlet");
-        out.flush();
+        
 }
 
