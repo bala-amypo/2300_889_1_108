@@ -11,12 +11,8 @@ public class HelloServlet extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("text/plain");
-        resp.getWriter().write("Hello from Dynamic Event Ticket Pricing Engine Servlet");
-    }
-      @Override
-    protected void doPost(HttpServletRequest request,
-                          HttpServletResponse response) throws ServletException, IOException {
-        doGet(request, response);
-    }
+        PrintWriter out = response.getWriter();
+        out.write("Hello from Dynamic Event Ticket Pricing Engine Servlet");
+        out.flush();
 }
 
